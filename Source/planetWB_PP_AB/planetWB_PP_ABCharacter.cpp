@@ -4,12 +4,14 @@
 #include "Engine/LocalPlayer.h"
 #include "Camera/CameraComponent.h"
 #include "Components/CapsuleComponent.h"
+#include "GameFramework/Actor.h"
 #include "GameFramework/CharacterMovementComponent.h"
-#include "GameFramework/SpringArmComponent.h"
 #include "GameFramework/Controller.h"
+#include "GameFramework/SpringArmComponent.h"
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "InputActionValue.h"
+#include "Kismet/KismetMathLibrary.h"
 
 DEFINE_LOG_CATEGORY(LogTemplateCharacter);
 
@@ -18,6 +20,7 @@ DEFINE_LOG_CATEGORY(LogTemplateCharacter);
 
 AplanetWB_PP_ABCharacter::AplanetWB_PP_ABCharacter()
 {
+	PrimaryActorTick.bCanEverTick = true;
 	// Set size for collision capsule
 	GetCapsuleComponent()->InitCapsuleSize(42.f, 96.0f);
 		
@@ -67,6 +70,58 @@ void AplanetWB_PP_ABCharacter::BeginPlay()
 			Subsystem->AddMappingContext(DefaultMappingContext, 0);
 		}
 	}
+}
+
+void AplanetWB_PP_ABCharacter::Tick(float DeltaSeconds)
+{
+	Super::Tick(DeltaSeconds);
+	UpdateUpVector();
+	AlignCharacter();
+	if (IsPlayerControlled())
+		UpdateCamera();
+}
+
+void AplanetWB_PP_ABCharacter::UpdateCamera()
+{
+	//FVector2D LookAxis = 
+
+}
+
+void AplanetWB_PP_ABCharacter::AlignCharacter()
+{
+	if (!ClosestPlanet) 
+		return;
+
+	FVector ActorLocation = GetActorLocation();
+	//FVector PlanetLocation = ClosestPlanet->GetActorLocation();
+
+	FVector GravityDirection = (PlanetLocation - ActorLocation).GetSafeNormal();
+	FVector ForwardDirection = FWPoint->GetComponentLocation() - ActorLocation;
+	ForwardDirection.Normalize();
+
+	FRotator NewRotation = UKismetMathLibrary::MakeRotFromZX(GravityDirection, ForwardDirection);
+	SetActorRotation(NewRotation);
+}
+
+void AplanetWB_PP_ABCharacter::UpdateUpVector()
+{
+	/* 
+	float WorldDeltaTime = GetWorld()->GetDeltaSeconds(); 
+	FVector zeroVector = FVector::ZeroVector;
+
+	ClosestPlanet->GetActorLocation();
+
+	FVector selectedVector = UKismetMathLibrary::SelectVector(updateLocation, zeroVector, bUsePlanetGravity);
+	FMath::Lerp(UpVector, selectedVector, 1 * WorldDeltaTime);
+	if (IsValid) 
+	{
+		ClosestPlanet->SetActorLocation(PlanetLocation);
+	}
+	else
+	{
+		SetActorLocation(UpVector);
+	}
+	*/ 
 }
 
 //////////////////////////////////////////////////////////////////////////

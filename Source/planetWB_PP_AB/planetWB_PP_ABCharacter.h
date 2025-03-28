@@ -63,11 +63,32 @@ protected:
 	
 	// To add mapping context
 	virtual void BeginPlay();
+	virtual void Tick(float DeltaSeconds) override;
 
 public:
 	/** Returns CameraBoom subobject **/
 	FORCEINLINE class USpringArmComponent* GetCameraBoom() const { return CameraBoom; }
 	/** Returns FollowCamera subobject **/
 	FORCEINLINE class UCameraComponent* GetFollowCamera() const { return FollowCamera; }
+
+public:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Gravity")
+	AActor* ClosestPlanet;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Gravity")
+	FVector UpVector;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Gravity")
+	FVector PlanetLocation;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Gravity")
+	bool bUsePlanetGravity;
+	UPROPERTY(EditAnywhere, Category = "Gravity")
+	USceneComponent* FWPoint;
+
+private:
+	UFUNCTION()
+	void UpdateCamera();
+	UFUNCTION(BlueprintCallable)
+	void AlignCharacter();
+	UFUNCTION()
+	void UpdateUpVector();
 };
 
